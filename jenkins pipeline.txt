@@ -1,0 +1,28 @@
+node {
+    stage('Checkout the Git Repo') {
+        git credentialsId: 'git-creds', url: 'https://github.com/mwaqar29/cicd-pipeline'
+    }
+
+    stage('Maven Clean Package') {
+        sh 'mvn clean package'
+    }
+
+    stage('Build Docker Image') {
+        sh 'docker build -t waqar29/cicd-pipeline .'
+    }
+
+    stage('Login and Push the Docker Image') {
+        withCredentials([string(credentialsId: 'docker-hub-creds', variable: 'dockerHubCred')]) {
+            sh 'docker login -u waqar29 -p ${dockerHubCred}'
+        }
+        sh 'docker push waqar29/cicd-pipeline'
+    }
+
+    stage('Pull the Docker Image') {
+        sh 'docker pull waqar29/cicd-pipeline'
+    } 
+
+    stage('Run Docker Tomcat Container') {
+        sh 'docker run -d -p 8888:8888 waqar29/cicd-pipeline'
+    }
+}
