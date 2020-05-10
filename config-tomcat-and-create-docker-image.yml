@@ -1,0 +1,7 @@
+---
+- hosts: all
+  become: true
+  tasks:
+  - name: building docker image
+    command: docker build -t waqar29/cicd-pipeline .
+...

@@ -7,8 +7,8 @@ node {
         sh 'mvn clean install package'
     }
 
-    stage('Build Docker Image') {
-        sh 'docker build -t waqar29/cicd-pipeline .'
+    stage('Configure Tomcat and Build Docker Image') {
+        sh 'ansible-playbook -i /etc/ansible/hosts config-tomcat-and-create-docker-image.yml'
     }
 
     stage('Login and Push the Docker Image') {
