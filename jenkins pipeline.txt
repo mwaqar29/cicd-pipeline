@@ -4,7 +4,7 @@ node {
     }
 
     stage('Maven Clean Package') {
-        sh 'mvn clean package'
+        sh 'mvn clean install package'
     }
 
     stage('Build Docker Image') {
@@ -23,6 +23,6 @@ node {
     } 
 
     stage('Run Docker Tomcat Container') {
-        sh 'docker run -d -p 8885:8885 waqar29/cicd-pipeline'
+        sh 'docker run -d -p 8885:8080 waqar29/cicd-pipeline'
     }
 }
