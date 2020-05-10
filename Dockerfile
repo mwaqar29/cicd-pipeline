@@ -7,7 +7,3 @@ WORKDIR /root/cicd-pipeline
 ADD tomcat-users.xml $CATALINA_HOME/conf
 
 ADD target/cicd-pipeline-0.0.1-SNAPSHOT.war  /usr/local/tomcat/webapps/
-
-
-
-

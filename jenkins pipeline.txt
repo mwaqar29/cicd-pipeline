@@ -23,6 +23,6 @@ node {
     } 
 
     stage('Run Docker Tomcat Container') {
-        sh 'docker run -d -p 8888:8888 waqar29/cicd-pipeline'
+        sh 'docker run -d -p 8885:8885 waqar29/cicd-pipeline'
     }
 }
