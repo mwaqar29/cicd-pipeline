@@ -1,28 +1,50 @@
-node {
-    stage('Checkout the Git Repo') {
-        git credentialsId: 'git-creds', url: 'https://github.com/mwaqar29/cicd-pipeline'
-    }
-
-    stage('Maven Clean Package') {
-        sh 'mvn clean install package'
-    }
-
-    stage('Configure Tomcat and Build Docker Image') {
-        sh 'ansible-playbook -i /etc/ansible/hosts config-tomcat-and-create-docker-image.yml'
-    }
-
-    stage('Login and Push the Docker Image') {
-        withCredentials([string(credentialsId: 'docker-hub-creds', variable: 'dockerHubCred')]) {
-            sh 'docker login -u waqar29 -p ${dockerHubCred}'
+pipeline {
+   agent any
+   stages {
+        stage('Checkout the Git Repo') {
+            steps {
+                git credentialsId: 'git-creds', url: 'https://github.com/mwaqar29/cicd-pipeline'
+            }
         }
-        sh 'docker push waqar29/cicd-pipeline'
+
+        stage('Maven Clean Package') {
+            steps {
+                sh 'mvn clean install package'
+            }
+        }
+    
+        stage('Configure Tomcat and Build Docker Image') {
+            steps {
+                sh 'ansible-playbook -i /etc/ansible/hosts config-tomcat-and-create-docker-image.yml'
+            }
+        }
+    
+        stage('Login and Push the Docker Image') {
+            steps {
+                withCredentials([string(credentialsId: 'docker-hub-creds', variable: 'dockerHubCred')]) {
+                    sh 'docker login -u waqar29 -p ${dockerHubCred}'
+                }
+                sh 'docker push waqar29/cicd-pipeline'
+            }
+        }
+    
+        stage('Pull the Docker Image') {
+            steps {
+                sh 'docker pull waqar29/cicd-pipeline'
+            }
+        } 
+    
+        stage('Run Docker Tomcat Container') {
+            steps {
+                sh 'docker run -d -p 8885:8080 waqar29/cicd-pipeline'
+            }
+        }
     }
-
-    stage('Pull the Docker Image') {
-        sh 'docker pull waqar29/cicd-pipeline'
-    } 
-
-    stage('Run Docker Tomcat Container') {
-        sh 'docker run -d -p 8885:8080 waqar29/cicd-pipeline'
+    post {
+        failure {
+            emailext subject: 'Build Failed: Jenkins',
+                body: 'Build triggered on Jenkins has failed. Please check the console output',
+                to: 'mwaqar29@gmail.com'
+        }
     }
 }
