@@ -12,6 +12,12 @@ pipeline {
                 sh 'mvn clean install package'
             }
         }
+        
+        stage('Run Sonarqube SCA') {
+            steps {
+                sh 'mvn sonar:sonar -Dsonar.host.url=http://13.235.69.145:9000/ -Dsonar.login=23eb07e06add3851cebd28d82f290b7b62564486'
+            }
+        }
     
         stage('Configure Tomcat and Build Docker Image') {
             steps {
